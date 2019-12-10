@@ -1,7 +1,6 @@
 class ImageMagnifier
 {
 	constructor() {
-		this.img = null;
 		this.zoom = null;
 		this.glass = null;
 		this.glassSize = null;
@@ -9,82 +8,91 @@ class ImageMagnifier
 
 	init(img, glassSize, zoom) {
 		console.log('init called !');
-		this.img = document.getElementById(img);
+  		
+  		let images = document.querySelectorAll('.' + img);
+
 		this.zoom = zoom;
 		this.glassSize = glassSize;
-		this.img.addEventListener('load', () => {
-			this.build();
-		});
+  		
+  		console.log(images);
+
+  		for (let i=0;i<images.length;i++) {
+  			let img = images[i];
+  			console.log(img);
+			img.addEventListener('load', () => {
+				this.build(img);
+			});	
+  		}
+
+		
 	}
 
-	build() {
+	build(img) {
 		console.log('build called !');
-		this.glass = document.createElement('div');
+		let glass = document.createElement('div');
 
-		this.glass.style.position = 'absolute';
-		this.glass.style.borderRadius = '100%';
-		this.glass.style.cursor = 'none';
-		this.glass.style.width = this.glassSize + 'px';
-		this.glass.style.height = this.glassSize + 'px';
-		this.glass.style.transform = 'scale(0, 0)';
-		this.glass.style.transformOrigin = 'center';
-		this.glass.style.transition = 'transform 0.15s cubic-bezier(0.175, 0.885, 0.42, 1.5) 0.05s';
-		this.glass.style.boxShadow = '-1px 2px 10px 10px rgba(0, 0, 0, 0.7) inset';
+		glass.style.position = 'absolute';
+		glass.style.borderRadius = '100%';
+		glass.style.cursor = 'none';
+		glass.style.width = this.glassSize + 'px';
+		glass.style.height = this.glassSize + 'px';
+		glass.style.transform = 'scale(0, 0)';
+		glass.style.transformOrigin = 'center';
+		glass.style.transition = 'transform 0.15s cubic-bezier(0.175, 0.885, 0.42, 1.5) 0.05s';
+		glass.style.boxShadow = '-1px 2px 10px 10px rgba(0, 0, 0, 0.7) inset';
 
-		this.img.parentElement.insertBefore(this.glass, this.img);
-		this.img.parentElement.style.position = 'relative';
+		img.parentElement.insertBefore(glass, img);
+		img.parentElement.style.position = 'relative';
 
-		this.glass.style.backgroundImage = "url('" + this.img.src + "')";
-  		this.glass.style.backgroundRepeat = "no-repeat";
-  		console.log(this.img.width);
-  		this.glass.style.backgroundSize = ((this.img.width + 0) * this.zoom) + "px " + ((this.img.height + 0) * this.zoom) + "px";
+		glass.style.backgroundImage = "url('" + img.src + "')";
+  		glass.style.backgroundRepeat = "no-repeat";
+  		glass.style.backgroundSize = ((img.width + 0) * this.zoom) + "px " + ((img.height + 0) * this.zoom) + "px";
 
-  		console.log(this.glass.style.backgroundSize);
-
-		this.createEvent();
+		this.createEvent(img, glass);
 	}
 
-	createEvent() {
+	createEvent(img, glass) {
 		console.log('createEvent called !');
-  		this.img.addEventListener("mouseover", (e) => { this.glass.style.transitionTimingFunction = 'cubic-bezier(0.175, 0.885, 0.42, 1.5)'; this.glass.style.transform = 'scale(1, 1)';} );
-  		this.img.addEventListener("mouseout", (e) => { this.glass.style.transitionTimingFunction = 'linear'; this.glass.style.transform = 'scale(0, 0)';} );
-  		this.glass.addEventListener("mouseover", (e) => { this.glass.style.transitionTimingFunction = 'cubic-bezier(0.175, 0.885, 0.42, 1.5)'; this.glass.style.transform = 'scale(1, 1)'; } );
-  		this.glass.addEventListener("mouseout", (e) => { this.glass.style.transitionTimingFunction = 'linear'; this.glass.style.transform = 'scale(0, 0)';} );
+  		img.addEventListener("mouseover", (e) => { glass.style.transitionTimingFunction = 'cubic-bezier(0.175, 0.885, 0.42, 1.5)'; glass.style.transform = 'scale(1, 1)';} );
+  		img.addEventListener("mouseout", (e) => { glass.style.transitionTimingFunction = 'linear'; glass.style.transform = 'scale(0, 0)';} );
+  		glass.addEventListener("mouseover", (e) => { glass.style.transitionTimingFunction = 'cubic-bezier(0.175, 0.885, 0.42, 1.5)'; glass.style.transform = 'scale(1, 1)'; } );
+  		glass.addEventListener("mouseout", (e) => { glass.style.transitionTimingFunction = 'linear'; glass.style.transform = 'scale(0, 0)';} );
 
-		this.glass.addEventListener("mousemove", (e) => {this.moveGlass(e)} );
-  		this.img.addEventListener("mousemove", (e) => {this.moveGlass(e)} );
+		glass.addEventListener("mousemove", (e) => { return this.moveGlass(e, img, glass)} );
+  		img.addEventListener("mousemove", (e) => { return this.moveGlass(e, img, glass)} );
 	}
 
-	moveGlass(e) {
+	moveGlass(e, img, glass) {
 		console.log('moveGlass');
+		console.log(img);
 		let pos;
 		let x;
 		let y;
 		let bw = 3;
   		console.log(e);
-  		let w = this.glass.offsetWidth / 2;
-  		let h = this.glass.offsetHeight / 2;
+  		let w = glass.offsetWidth / 2;
+  		let h = glass.offsetHeight / 2;
 
 		e.preventDefault();
-		pos = this.getCursorPos(e);
+		pos = this.getCursorPos(e, img);
 		x = pos.x;
 		y = pos.y;
 
-		if (x > this.img.width - (w / this.zoom)) {x = this.img.width - (w / this.zoom);}
+		if (x > img.width - (w / this.zoom)) {x = img.width - (w / this.zoom);}
 	    if (x < w / this.zoom) {x = w / this.zoom;}
-	    if (y > this.img.height - (h / this.zoom)) {y = this.img.height - (h / this.zoom);}
+	    if (y > img.height - (h / this.zoom)) {y = img.height - (h / this.zoom);}
 	    if (y < h / this.zoom) {y = h / this.zoom;}
 
-	    this.glass.style.left = (x - w) + "px";
-    	this.glass.style.top = (y - h) + "px";
+	    glass.style.left = (x - w) + "px";
+    	glass.style.top = (y - h) + "px";
 
-    	this.glass.style.left = (x - w) + "px";
-    	this.glass.style.top = (y - h) + "px";
+    	glass.style.left = (x - w) + "px";
+    	glass.style.top = (y - h) + "px";
 
-    	this.glass.style.backgroundPosition = "-" + ((x * this.zoom) - w + bw) + "px -" + ((y * this.zoom) - h + bw) + "px";
+    	glass.style.backgroundPosition = "-" + ((x * this.zoom) - w + bw) + "px -" + ((y * this.zoom) - h + bw) + "px";
 	}
 
-	getCursorPos(e) {
+	getCursorPos(e, img) {
     	let a;
     	let x = 0;
     	let y = 0;
@@ -92,7 +100,7 @@ class ImageMagnifier
 	    e = e || window.event;
 
 	    /*get the x and y positions of the image:*/
-	    a = this.img.getBoundingClientRect();
+	    a = img.getBoundingClientRect();
 	    
 	    /*calculate the cursor's x and y coordinates, relative to the image:*/
 	    x = e.pageX - a.left;
