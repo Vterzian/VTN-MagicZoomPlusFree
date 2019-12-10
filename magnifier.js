@@ -14,8 +14,6 @@ class ImageMagnifier
 		this.zoom = zoom;
 		this.glassSize = glassSize;
   		
-  		console.log(images);
-
   		for (let i=0;i<images.length;i++) {
   			let img = images[i];
   			console.log(img);
@@ -64,12 +62,10 @@ class ImageMagnifier
 
 	moveGlass(e, img, glass) {
 		console.log('moveGlass');
-		console.log(img);
 		let pos;
 		let x;
 		let y;
 		let bw = 3;
-  		console.log(e);
   		let w = glass.offsetWidth / 2;
   		let h = glass.offsetHeight / 2;
 
